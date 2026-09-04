@@ -1,0 +1,167 @@
+<meta charset="utf-8" />
+<title>Planner</title>
+<link rel="stylesheet" href="/src/styles.css" />
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <h1>Planner</h1>
+      <span class="week" id="week-label">—</span>
+    </div>
+
+    <div class="nav">
+      <button class="btn icon ghost" id="prev-week" title="Previous week (←)">‹</button>
+      <button class="btn ghost" id="this-week" title="Jump to this week (T)">Today</button>
+      <button class="btn icon ghost" id="next-week" title="Next week (→)">›</button>
+    </div>
+
+    <span class="spacer"></span>
+
+    <div class="search">
+      <span class="glass">⌕</span>
+      <input id="search" type="text" placeholder="Search all tasks…" spellcheck="false" autocomplete="off" />
+      <button class="clear" id="search-clear" title="Clear (Esc)" hidden>✕</button>
+    </div>
+
+    <button class="btn ghost" id="show-completed" title="Completed tasks (D)">✓ Completed</button>
+    <button class="btn primary" id="new-task" title="New task (N)">＋ New task</button>
+    <button class="btn ghost" id="hide-planner" title="Back to the desktop">Hide</button>
+  </header>
+
+  <div class="main">
+    <div class="board" id="board"></div>
+
+    <aside class="side">
+      <section class="panel backlog">
+        <div class="panel-head">
+          <h2>Backlog</h2>
+          <span class="count" id="backlog-count">0</span>
+          <span class="grow"></span>
+          <button class="mini" id="backlog-sweep" title="Move every backlog task to today">⇥ Today</button>
+        </div>
+        <div class="list" id="backlog-list"></div>
+      </section>
+
+      <section class="panel month">
+        <div class="panel-head">
+          <h2>Monthly</h2>
+          <span class="count" id="month-count">0</span>
+          <span class="grow"></span>
+          <button class="mini" id="month-prev" title="Previous month">‹</button>
+          <span class="mlabel" id="month-label">—</span>
+          <button class="mini" id="month-next" title="Next month">›</button>
+          <button class="mini" id="month-add" title="New monthly task">＋</button>
+        </div>
+        <div class="list" id="month-list"></div>
+      </section>
+    </aside>
+
+    <div class="results" id="history" hidden>
+      <div class="veil"></div>
+      <div class="sheet">
+        <div class="panel-head">
+          <h2>Completed</h2>
+          <span class="count" id="history-count">0</span>
+          <span class="grow"></span>
+          <button class="mini" id="history-close" title="Close (Esc)">✕</button>
+        </div>
+        <div class="list" id="history-list"></div>
+      </div>
+    </div>
+
+  <div class="results" id="results" hidden>
+      <div class="veil"></div>
+      <div class="sheet">
+        <div class="panel-head">
+          <h2>Search</h2>
+          <span class="count" id="results-count">0</span>
+          <span class="grow"></span>
+          <button class="mini" id="results-close" title="Close (Esc)">✕</button>
+        </div>
+        <div class="list" id="results-list"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="scrim" id="editor" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+    <header>
+      <h3 id="editor-title">New task</h3>
+      <span class="spacer" style="flex:1"></span>
+      <button class="btn ghost icon" id="editor-x" title="Close (Esc)">✕</button>
+    </header>
+
+    <div class="content">
+      <div class="error" id="editor-error" hidden></div>
+
+      <div class="field">
+        <label for="f-title">Task</label>
+        <input id="f-title" type="text" placeholder="What needs doing?" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label>Where it lives</label>
+        <div class="segment" id="f-scope">
+          <button type="button" data-scope="day">A day</button>
+          <button type="button" data-scope="month">This month</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field" id="f-date-wrap">
+          <label for="f-date">Date</label>
+          <input id="f-date" type="date" />
+        </div>
+        <div class="field" id="f-month-wrap" hidden>
+          <label for="f-month">Month</label>
+          <select id="f-month"></select>
+        </div>
+        <div class="field" id="f-slot-wrap">
+          <label>Time block</label>
+          <div class="segment" id="f-slot">
+            <button type="button" data-slot="work">09:00 – 17:00</button>
+            <button type="button" data-slot="evening">Evening</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint" id="f-weekend-hint" hidden>
+        Weekends have no time blocks — this task sits on the day itself.
+      </div>
+
+      <div class="field">
+        <label>Priority</label>
+        <div class="segment" id="f-priority">
+          <button type="button" data-priority="0">Low</button>
+          <button type="button" data-priority="1">Normal</button>
+          <button type="button" data-priority="2">High</button>
+        </div>
+      </div>
+
+      <div class="field" id="f-completed-wrap" hidden>
+        <label for="f-completed">Completed on</label>
+        <input id="f-completed" type="date" />
+        <div class="hint">Defaults to the day you tick it. Change it if you actually finished this earlier.</div>
+      </div>
+
+      <div class="field">
+        <label for="f-notes">Notes</label>
+        <textarea id="f-notes" placeholder="Detail, links, context…" spellcheck="true"></textarea>
+      </div>
+    </div>
+
+    <footer>
+      <button class="btn danger" id="f-delete" hidden>Delete</button>
+      <span style="flex:1"></span>
+      <button class="btn ghost" id="f-done-toggle">Mark done</button>
+      <button class="btn" id="f-cancel">Cancel</button>
+      <button class="btn primary" id="f-save">Save</button>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script type="module" src="/src/planner.ts"></script>

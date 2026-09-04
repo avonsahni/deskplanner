@@ -1,0 +1,14 @@
+<meta charset="utf-8" />
+<title>Open Planner</title>
+<link rel="stylesheet" href="/src/styles.css" />
+<style>
+  /* This window is transparent; the pill is the only thing that should paint. */
+  html, body { background: transparent !important; }
+</style>
+<div class="launch" data-tauri-drag-region>
+  <button id="open" title="Open the Planner">
+    <span>Planner</span>
+    <span class="badge" id="badge" hidden>0</span>
+  </button>
+</div>
+<script type="module" src="/src/launcher.ts"></script>

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Planner",
+  "version": "0.1.0",
+  "identifier": "com.avonsahni.planner",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "wallpaper",
+        "url": "wallpaper.html",
+        "title": "Planner Wallpaper",
+        "width": 1440,
+        "height": 900,
+        "x": 0,
+        "y": 0,
+        "resizable": false,
+        "decorations": false,
+        "shadow": false,
+        "visible": true,
+        "focus": false,
+        "skipTaskbar": true,
+        "alwaysOnTop": false
+      },
+      {
+        "label": "planner",
+        "url": "index.html",
+        "title": "Planner",
+        "width": 1360,
+        "height": 860,
+        "minWidth": 1040,
+        "minHeight": 640,
+        "resizable": true,
+        "center": true,
+        "visible": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
+      },
+      {
+        "label": "launcher",
+        "url": "launcher.html",
+        "title": "Open Planner",
+        "width": 152,
+        "height": 52,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "visible": true,
+        "focus": false,
+        "skipTaskbar": true,
+        "alwaysOnTop": true
+      }
+    ],
+    "security": {
+      "csp": null
+    },
+    "macOSPrivateApi": true
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "app",
+      "dmg"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  }
+}
