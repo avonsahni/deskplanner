@@ -93,6 +93,21 @@ async function render() {
   top.append(stat);
   wall.append(top);
 
+  // First run shows an empty grid, which tells a new user nothing about how to
+  // get in. The row is always present so the grid template stays stable.
+  const hint = el("div", "wall-hint");
+  if (!week.length && !back.length && !month.length) {
+    hint.append(
+      el("b", "", "Nothing planned yet."),
+      document.createTextNode(" Click the "),
+      el("span", "kbd", "Planner"),
+      document.createTextNode(" pill in the bottom-right corner, then press "),
+      el("span", "kbd", "N"),
+      document.createTextNode(" to add your first task."),
+    );
+  }
+  wall.append(hint);
+
   // ---- week grid
   const grid = el("div", "wall-grid");
   for (let i = 0; i < 5; i++) {

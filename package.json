@@ -16,5 +16,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2"
-  }
+  },
+  "license": "MIT",
+  "description": "A calendarised weekly planner that lives on your desktop wallpaper"
 }

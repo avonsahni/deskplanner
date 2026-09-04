@@ -103,6 +103,19 @@ reading the code:
   editor was reached with a temporary boot hook instead, since reverted.
 - Multi-monitor placement.
 
+### Packaging
+
+- **Universal binary** (Apple Silicon + Intel) — the first build was arm64 only,
+  which would simply not run for anyone on an Intel Mac. `lipo -info` confirms
+  `x86_64 arm64`. 8.1 MB app, **4.09 MB DMG**.
+- **Ad-hoc signed only.** No Apple Developer ID, so recipients must clear the
+  quarantine flag or use *Open Anyway*. Documented in the README rather than
+  left as a surprise; the notarisation path is written up in PLAN.md.
+- **First-run hint on the wallpaper.** An empty board told a new user nothing
+  about how to get in. It now names the launcher pill and the `N` shortcut, and
+  disappears as soon as anything is planned.
+- MIT licensed.
+
 ### Deliberately not done
 
 - No FTS5 virtual table. Revisit only if a real dataset makes `LIKE` slow.

@@ -11,6 +11,22 @@
 3. **Login item.** The app is meant to be always open; it currently has to be
    launched by hand. Add a "start at login" toggle.
 
+## Distribution
+
+The DMG is a **universal binary** (Apple Silicon + Intel), ad-hoc signed only.
+Recipients must clear the quarantine flag by hand — see the README.
+
+To remove that friction for everyone:
+
+1. Join the Apple Developer Program (~$99/yr) and create a *Developer ID
+   Application* certificate.
+2. Set `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`,
+   `APPLE_ID`, `APPLE_PASSWORD` and `APPLE_TEAM_ID`, then `npm run tauri build`
+   signs and notarises in one pass.
+3. Staple the ticket so it validates offline.
+
+Until then, unsigned is a deliberate, documented trade — not an oversight.
+
 ## Backlog of ideas
 
 - Date-range filter and search inside the Completed sheet — it currently loads

@@ -440,7 +440,7 @@ button, input, textarea, select {
 .wall {
   height: 100%;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   padding: 46px 56px 56px;
   gap: 22px;
   background:
@@ -449,6 +449,19 @@ button, input, textarea, select {
     radial-gradient(900px 500px at 50% 108%, rgba(45, 212, 191, 0.10), transparent 62%),
     linear-gradient(165deg, #131a2f, #0b0d13 66%);
 }
+.wall-hint:empty { display: none; }
+.wall-hint {
+  font-size: 13.5px; color: var(--muted); line-height: 1.6;
+  margin-top: -6px;
+}
+.wall-hint b { color: var(--text); font-weight: 600; }
+.wall-hint .kbd {
+  display: inline-block; padding: 1px 7px; margin: 0 1px;
+  border-radius: 6px; border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.07); color: var(--text);
+  font-size: 12px; font-weight: 560;
+}
+
 .wall-top { display: flex; align-items: flex-end; gap: 16px; }
 .wall-top h1 { margin: 0; font-size: 30px; font-weight: 300; letter-spacing: -0.02em; }
 .wall-top h1 b { font-weight: 640; }

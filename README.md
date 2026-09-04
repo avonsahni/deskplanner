@@ -43,6 +43,35 @@ because it uses the system WebView rather than shipping a browser.
 
 Requires Node 18+ and a Rust toolchain (`rustup`).
 
+## Installing it
+
+Grab `Planner.dmg`, drag **Planner** to Applications, then — because the app is
+not signed by a paid Apple Developer ID — clear the download quarantine flag:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Planner.app
+```
+
+Without that, macOS refuses to open it and (misleadingly) says the app is
+damaged. If you would rather not use the terminal: try to open it once, let it
+be blocked, then go to **System Settings → Privacy & Security**, scroll down,
+and click **Open Anyway**. On macOS 15 and later the old right-click → Open
+trick no longer works for unsigned apps.
+
+This is the honest cost of an unsigned build. Removing that step for everyone
+means an Apple Developer Program membership (£/$99 a year) and notarising the
+DMG — see [PLAN.md](PLAN.md).
+
+### What to expect on first launch
+
+- **Your wallpaper is replaced by the board.** That is the app, not a bug. Your
+  desktop icons still sit on top of it, and it is behind every window.
+- A small **Planner** pill floats in the bottom-right corner. That is the way
+  in. Drag it if it is in your way.
+- Closing the planner window **hides** it and brings the pill back — it does
+  not quit. To actually quit, use ⌘Q while the app is focused.
+- The board starts empty. Press `N` for your first task.
+
 ## Where the data lives
 
 One SQLite file, on your machine only, nothing over the network:
@@ -98,3 +127,7 @@ one-minute date-rollover check.
 One table, `tasks`. `scope` is either `day` (with a `date`, and a `slot` of
 `work`, `evening`, or NULL for weekends) or `month` (with a `month`). The
 backlog is a query, not a state: `done = 0 AND scope = 'day' AND date < today`.
+
+## License
+
+[MIT](LICENSE) — use it, fork it, ship it.
