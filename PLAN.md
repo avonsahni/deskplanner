@@ -2,6 +2,9 @@
 
 ## Next actions
 
+0. **Never let a subscription fail quietly again.** The 0.1.1 bug hid behind a
+   `void`-discarded promise rejection. Audit for any other fire-and-forget
+   promise whose failure would be invisible.
 1. **Verify the desktop layer on the real machine.** `pin_to_desktop` sets
    `NSWindow.level` to -2147483623. Confirm the board renders behind Finder
    icons and does not appear in Mission Control or the app switcher.

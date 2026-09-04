@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.1.1 — 2026-09-04
+
+Fixes a bug that made 0.1.0 effectively unusable.
+
+### The bug
+
+Every task action — adding, ticking, dragging, deleting — wrote to the
+database correctly but the board did not change. Only the **Today** button
+appeared to "work", because it was the one control that called `refresh()`
+directly rather than waiting for the backend's `tasks-changed` broadcast.
+
+### The cause
+
+There was no `src-tauri/capabilities/` file. Tauri v2 gates the core plugins
+behind an ACL, and with no capability declared, `gen/schemas/capabilities.json`
+was literally `{}` — nothing granted. The frontend's `listen("tasks-changed")`
+calls `plugin:event|listen`, which was therefore denied.
+
+App-defined commands are *not* ACL-gated, which is exactly why this was so
+easy to miss: every write worked perfectly, so the data was always right; only
+the notification back to the windows was blocked. The wallpaper was equally
+stale for the same reason.
+
+It was silent because the failure surfaced as a rejected promise from
+`listen()`, and the call site was `void onTasksChanged(...)` — which discards
+it. A subscription that cannot fail loudly is a subscription you cannot trust.
+
+### The fix
+
+- Added `src-tauri/capabilities/default.json` granting `core:default` to all
+  three windows. `capabilities.json` now actually contains a grant.
+- Added `mutate()`, which re-reads immediately after this window's own edits.
+  A window should never depend on a round trip through the backend to show a
+  change the user just made; the broadcast is now only what keeps the *other*
+  windows in step.
+- The `listen()` rejection is no longer swallowed — it raises a visible toast
+  saying live updates are off.
+
+### Verified
+
+Reproduced the failure, then confirmed the fix by creating a task through a
+path that deliberately bypassed `mutate()`, so only the event could update the
+board. The card appeared. Screenshotted.
+
 ## 0.1.0 — 2026-09-04
 
 First working build. Everything in the spec is implemented.

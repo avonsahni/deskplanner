@@ -60,7 +60,8 @@ export const api = {
   closePlanner: () => invoke<void>("close_planner"),
 };
 
-/** Fired by the backend after every mutation, in every window. */
+/** Fired by the backend after every mutation, in every window.
+ *  Rejects if the ACL has not granted `core:event` — do not swallow that. */
 export function onTasksChanged(fn: () => void) {
   return listen("tasks-changed", fn);
 }

@@ -33,6 +33,20 @@ function toast(message: string, bad = false) {
   toastTimer = window.setTimeout(() => { el.hidden = true; }, bad ? 4200 : 2000);
 }
 
+/** Run a mutation, then re-read immediately. The backend also broadcasts
+ *  `tasks-changed` so the wallpaper keeps up, but this window should never
+ *  depend on a round trip to show an edit the user just made. */
+async function mutate(work: () => Promise<unknown>): Promise<boolean> {
+  try {
+    await work();
+  } catch (e) {
+    toast(errorText(e), true);
+    return false;
+  }
+  await refresh();
+  return true;
+}
+
 async function guard<T>(work: () => Promise<T>): Promise<T | undefined> {
   try {
     return await work();
@@ -79,7 +93,7 @@ function card(task: Task, opts: CardOpts = {}): HTMLElement {
   check.title = task.done ? "Mark as not done" : "Mark as done";
   check.addEventListener("click", (e) => {
     e.stopPropagation();
-    void guard(() => api.setDone(task.id, !task.done));
+    void mutate(() => api.setDone(task.id, !task.done));
   });
 
   const body = document.createElement("div");
@@ -143,7 +157,7 @@ function card(task: Task, opts: CardOpts = {}): HTMLElement {
       b.addEventListener("click", (e) => {
         e.stopPropagation();
         const slot = isWeekend(target) ? null : (task.slot ?? "work");
-        void guard(() => api.reschedule(task.id, "day", ymd(target), slot, null));
+        void mutate(() => api.reschedule(task.id, "day", ymd(target), slot, null));
       });
       return b;
     };
@@ -195,7 +209,7 @@ function dropTarget(el: HTMLElement, target: Target) {
     el.classList.remove("drop");
     const id = Number(e.dataTransfer?.getData("text/plain"));
     if (!Number.isFinite(id) || id <= 0) return;
-    void guard(() => api.reschedule(id, target.scope, target.date, target.slot, target.month));
+    void mutate(() => api.reschedule(id, target.scope, target.date, target.slot, target.month));
   });
 }
 
@@ -569,6 +583,7 @@ async function saveDraft() {
     if (draft.id === undefined) await api.createTask(payload);
     else await api.updateTask({ ...payload, id: draft.id });
     closeEditor();
+    await refresh();
   } catch (e) {
     showEditorError(errorText(e));
   }
@@ -616,7 +631,7 @@ function wire() {
     const stamp = ymd(today());
     const slot: Slot = isWeekend(today()) ? null : "work";
     const moved = backlogTasks.length;
-    await guard(async () => {
+    await mutate(async () => {
       for (const t of backlogTasks) await api.reschedule(t.id, "day", stamp, slot, null);
     });
     toast(`Moved ${moved} task${moved === 1 ? "" : "s"} to today.`);
@@ -686,7 +701,7 @@ function wire() {
     if (!deleteArmed) { deleteArmed = true; syncEditor(); return; }
     const id = draft.id;
     closeEditor();
-    await guard(() => api.deleteTask(id));
+    await mutate(() => api.deleteTask(id));
     toast("Task deleted.");
   });
   need("f-title").addEventListener("keydown", (e) => {
@@ -736,7 +751,8 @@ function wire() {
 // --------------------------------------------------------------------- boot
 wire();
 void refresh();
-void onTasksChanged(() => void refresh());
+onTasksChanged(() => void refresh()).catch((e) =>
+  toast(`Live updates are off — other windows will lag: ${errorText(e)}`, true));
 
 // Roll the "today" highlight over at midnight without a restart.
 let lastStamp = ymd(today());
