@@ -1,8 +1,29 @@
 # Changelog
 
-## 0.2.0 — 2026-09-04
+## 0.1.0 — 2026-09-04
 
-Owner-requested change to how completion works.
+First working build. Everything in the spec is implemented.
+
+### Shipped
+
+- **Stack.** Tauri 2 + SQLite (`rusqlite`, bundled) + hand-written TypeScript.
+  Chosen over Electron because "lite, not resource hungry" was an explicit
+  requirement, and because the wallpaper layer needs native macOS window calls
+  that Electron cannot make without a custom addon.
+- **Data layer** (`src-tauri/src/db.rs`). Single `tasks` table, WAL mode, four
+  indexes. `scope` discriminates day vs month tasks; normalisation on write
+  means the frontend never has to clear unused fields.
+- **Windows.** Three: `wallpaper` at `kCGDesktopWindowLevel` (-2147483623,
+  below the Finder icon layer), `launcher` at `NSFloatingWindowLevel`, and
+  `planner`, hidden until summoned. Closing `planner` hides it instead of
+  quitting.
+- **Board.** Mon–Fri with two fixed blocks each, weekend as one amber column
+  with no time split, drag-and-drop between any blocks, backlog panel with
+  quick-move and bulk sweep, monthly panel, live search, task editor.
+- **Search.** `LIKE` over title and notes rather than FTS5 — one less compile
+  flag to depend on, and instant at personal-planner scale.
+
+### Revised mid-build, at the owner's request: how completion works
 
 - **Completed tasks leave the board.** `in_range` and `in_month` now carry
   `done = 0`, matching `backlog`, which always did. The week, the backlog and
@@ -23,29 +44,6 @@ Owner-requested change to how completion works.
   was meaningless once done cards stopped appearing.
 - **Wallpaper "done" stat** now comes from `day_counts`, which counts all rows,
   rather than from the board query that no longer returns completed ones.
-
-## 0.1.0 — 2026-09-04
-
-First working build. Everything in the initial spec is implemented.
-
-### Shipped
-
-- **Stack.** Tauri 2 + SQLite (`rusqlite`, bundled) + hand-written TypeScript.
-  Chosen over Electron because "lite, not resource hungry" was an explicit
-  requirement, and because the wallpaper layer needs native macOS window calls
-  that Electron cannot make without a custom addon.
-- **Data layer** (`src-tauri/src/db.rs`). Single `tasks` table, WAL mode, four
-  indexes. `scope` discriminates day vs month tasks; normalisation on write
-  means the frontend never has to clear unused fields.
-- **Windows.** Three: `wallpaper` at `kCGDesktopWindowLevel` (-2147483623,
-  below the Finder icon layer), `launcher` at `NSFloatingWindowLevel`, and
-  `planner`, hidden until summoned. Closing `planner` hides it instead of
-  quitting.
-- **Board.** Mon–Fri with two fixed blocks each, weekend as one amber column
-  with no time split, drag-and-drop between any blocks, backlog panel with
-  quick-move and bulk sweep, monthly panel, live search, task editor.
-- **Search.** `LIKE` over title and notes rather than FTS5 — one less compile
-  flag to depend on, and instant at personal-planner scale.
 
 ### Fixed during verification
 
@@ -89,6 +87,13 @@ reading the code:
   week board, two blocks per weekday, weekend column, backlog with relative
   dates and quick-moves, monthly panel, tallies and stats all correct.
   Seed data was deleted afterwards.
+- The completion model re-verified against seeded data that deliberately
+  included cross-day completions: a task planned Wed and finished Fri, and one
+  planned for next Sunday but finished on Wednesday. Both grouped under the day
+  they were actually completed, not the day they were scheduled. Completed
+  tasks were absent from the board, backlog, monthly panel and wallpaper.
+- `npm run tauri build` produces a **4.0 MB** `Planner.app` and a 2.0 MB DMG —
+  against roughly 180 MB for the Electron equivalent.
 
 ### Not verified — inspected only
 

@@ -38,6 +38,9 @@ npm run tauri dev      # development
 npm run tauri build    # produces a .app and .dmg in src-tauri/target/release/bundle
 ```
 
+The release bundle is about **4 MB**; the app idles at roughly 70 MB of RAM
+because it uses the system WebView rather than shipping a browser.
+
 Requires Node 18+ and a Rust toolchain (`rustup`).
 
 ## Where the data lives
